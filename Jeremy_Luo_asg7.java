@@ -1,5 +1,6 @@
 
-/* Name: Jeremy Luo NetdID: jl12498
+/* Name: Jeremy Luo 
+BATTLESHIP GAME
 Course: [CS101]
 Description: Technical notes in the program.
 Date: 11/12
