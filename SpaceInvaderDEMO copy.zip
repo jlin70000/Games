@@ -239,3 +239,222 @@ void startGame(String selectedDifficulty) {
     enemy.setBulletSpeed(bulletSpeed);
   }
 }
+
+
+// Bullet Class
+
+class Bullet {
+  float x, y;
+  boolean shooting;
+  float speed; // Speed of the bullet
+
+  Bullet(float x, float y, int speed) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    shooting = true;
+  }
+
+  void display() {
+    if (shooting) {
+      fill(255, 0, 0); // Default color for player bullet
+      ellipse(x, y, 10, 10);
+      y -= speed; // Move the bullet
+      if (y < 0 || y > height) shooting = false; // Deactivate off-screen bullets
+    }
+  }
+}
+
+
+// Enemy Class
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+
+class Enemy {
+  float x, y;
+  boolean alive;
+  float speedX = 2; // Horizontal movement speed
+  float dropY = 50; // Vertical drop distance
+  PApplet parent; // Reference to the main Processing applet
+  PImage enemyImage;
+  int bulletSpeed;
+
+
+  Enemy(PApplet parent, float x, float y) {
+    this.parent = parent;
+    this.x = x;
+    this.y = y;
+    alive = true;
+
+    enemyImage = parent.loadImage("Enemy.jpg");
+  }
+
+  void display() {
+    if (alive) {
+      parent.image(enemyImage, x, y, 30, 30);
+    }
+  }
+
+  void move() {
+    x += speedX;
+    // Check if the enemy hits the edge of the screen
+    if (x <= 0 || x >= width - 30) {
+      speedX *= -1; // Reverse direction
+      y += dropY;   // Drop down
+    }
+  }
+  void setBulletSpeed(float speed) {
+    this.bulletSpeed = (int) speed;
+  }
+
+  EnemyBullet shoot() {
+    return new EnemyBullet(x + 15, y + 30, bulletSpeed); // Bullet starts from the bottom center of the enemy
+  }
+}
+
+
+// EnemyBullet class
+
+class EnemyBullet extends Bullet {
+
+  EnemyBullet(float x, float y, int speed) {
+    super(x, y, speed);
+  }
+
+  @Override
+  void display() {
+    if (shooting) {
+      fill(0, 255, 255); // Color for enemy bullet
+      ellipse(x, y, 10, 10);
+      y += speed; // Enemy bullet moves down
+      if (y > height) shooting = false; // Deactivate off-screen bullets
+    }
+  }
+}
+
+// GameTimer class
+
+class GameTimer {
+    int duration;
+    int startTime;
+    boolean isTimeUp;
+
+    GameTimer(int durationInSeconds) {
+        this.duration = durationInSeconds * 1000; // Convert seconds to milliseconds
+        this.isTimeUp = false;
+    }
+
+    void start() {
+        startTime = millis(); // Record the start time
+    }
+
+    void update() {
+        if (!isTimeUp && millis() - startTime > duration) {
+            isTimeUp = true;
+        }
+    }
+
+    void display() {
+        if (!isTimeUp) {
+            int remainingTime = duration - (millis() - startTime);
+            int seconds = remainingTime / 1000;
+            fill(255); // White color for text
+            textSize(20);
+            text("Time: " + seconds, width/2, 20); // Display time at the top-right corner
+        }
+    }
+
+    boolean isTimeUp() {
+        return isTimeUp;
+    }
+}
+
+// Lives class
+
+class Lives {
+    int count;
+    int initialLives;
+
+    Lives(int initialLives) {
+        count = initialLives;
+    }
+
+    void loseLife() {
+        if (count > 0) {
+            count--;
+        }
+    }
+
+    void display() {
+        fill(255, 0, 0); // Red color for lives
+        textSize(30);
+        text("Lives: " + count, 60, 20); // Display lives at the top-left corner
+    }
+    
+    
+}
+
+// Player class
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+class Player {
+  float x, y;
+  int width = 60, height = 40;
+  int speed;
+  boolean isHit = false;
+  PApplet parent;
+  PImage  spaceship;
+  int lives;
+
+  Player(PApplet parent,float x, float y, int speed) {
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.parent = parent;
+    lives = initialLives;
+    
+    spaceship = parent.loadImage("spaceshipimage.jpg");
+  }
+
+  void display() {
+    parent.image(spaceship,x,y,80,60);
+  }
+
+  void move(int dir) {
+    x += dir * speed;
+    // Boundary checking
+    x = constrain(x, 0, 800 - this.width); // 800 can be changed according to board size
+  }
+  
+  
+
+}
+
+// Score class
+
+class Score {
+    int value;
+
+    Score() {
+        value = 0;
+    }
+
+    void increase(int amount) {
+        value += amount;
+    }
+
+    int getScore() {
+        return value;
+    }
+
+    void display() {
+        fill(255);
+        textSize(20);
+        text("Score: " + value, width - 100, 20);
+    }
+}
+
